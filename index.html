@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmergeNav - Emergency Assistance Device</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>EmergeNav</h1>
+        <p>Your Reliable Emergency Assistance Device</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#description">Description</a></li>
+            <li><a href="#table-of-contents">Table of Contents</a></li>
+            <li><a href="#motivation">Motivation</a></li>
+            <li><a href="#design">Design</a></li>
+            <li><a href="#implementation">Implementation</a></li>
+            <li><a href="#demo">Demo</a></li>
+            <li><a href="#challenges">Challenges</a></li>
+            <li><a href="#future-work">Future Work</a></li>
+            <li><a href="#bill-of-materials">Bill of Materials</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="description">
+            <h2>Description</h2>
+            <p>EmergeNav is an emergency assistance device designed 
+                to help users quickly locate emergency services. The device integrates several components and services, 
+                including a TI CC3200 microcontroller with Wi-Fi, a GPS module, AWS IoT services, AWS Lambda Services,
+                 Google Places & Directions  API, an Adafruit OLED display, and AWS SNS for notifications. </p>
+            <img src="images\emergeNav.png" alt="EmergeNav device" class="feature-image" style="display: block; margin-left: auto; margin-right: auto;" width="500" height="300">
+        </section>
+        <section id="table-of-contents">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#motivation">Motivation</a></li>
+                <li><a href="#design">Design</a></li>
+                <ul>
+                    <li><a href="#system-architecture">System Architecture</a></li>
+                    <li><a href="#functional-specification">Functional Specification</a></li>
+                </ul>
+                <li><a href="#implementation">Implementation</a></li>
+                <ul>
+                    <li><a href="#subtopic1">AT&T Remote and IR sensor</a></li>
+                    <li><a href="#subtopic2">GPS Module and UART</a></li>
+                    <li><a href="#subtopic3">OLED and SPI</a></li>
+                    <li><a href="#subtopic4">AWS IoT core, Lambda and SNS</a></li>
+                </ul>
+                <li><a href="#challenges">Challenges</a></li>
+                <li><a href="#future-work">Future Work</a></li>
+                <li><a href="#bill-of-materials">Bill of Materials</a></li>
+            </ul>
+        </section>
+        <section id="motivation">
+            <h2>Motivation</h2>
+           
+            <p>In today's rapidly evolving world, the integration of Internet of Things (IoT) technology has become increasingly prevalent, revolutionizing various aspects of our lives. One area where IoT holds immense potential is in enhancing safety and efficiency through smart device ecosystems. The motivation behind the concept of our IoT device lies in addressing critical challenges related to emergency response and resource allocation, ultimately aiming to improve overall community well-being.</p>
+            <ul>
+                <li><b>Addressing Emergency Response Challenges</b>
+                Emergency situations, whether they be medical emergencies, fires, or other crises, demand swift and effective response mechanisms. However, traditional emergency response systems often face challenges such as delayed response times, inefficient resource allocation, and lack of real-time data. Inspired by existing technologies such as smart sensors, wearable devices, and real-time analytics platforms, our IoT device concept seeks to overcome these challenges by enabling proactive and data-driven emergency management.
+                <li>
+                <b>Real-Time Data Insights</b>
+                Central to our device concept is the utilization of real-time data insights to empower emergency responders and decision-makers. Drawing inspiration from existing IoT applications in smart cities and healthcare, our device collects and analyzes data such as location coordinates and types of nearby emergency services. This real-time data allows for quicker identification of emergency incidents, precise resource allocation, and enhanced coordination among responders, mirroring the success of similar technologies in optimizing urban infrastructure and healthcare delivery systems.
+            </li>
+            <li>
+                <b>Seamless Integration and Automation</b>
+                Another key motivation behind our device concept is to streamline emergency response processes through seamless integration and automation. Inspired by cloud-based IoT platforms such as AWS IoT Core and Google Cloud IoT, our device effortlessly communicates with cloud services, enabling automated updates to the device shadow and real-time decision-making. This automation reduces the burden on human operators, allowing them to focus on critical tasks during emergency situations, similar to the operational efficiencies achieved in industrial IoT applications.
+            </li>
+            <li>
+                <b>Empowering Communities</b>
+                At its core, our IoT device concept is driven by a commitment to empower communities and enhance public safety. Inspired by the resilience and adaptability of communities in the face of natural disasters and emergencies, our device provides access to timely and accurate information, enabling individuals to make informed decisions during crises. Moreover, by facilitating more efficient emergency response operations, our device contributes to building resilient and safer communities, echoing the collaborative efforts seen in community-driven IoT initiatives around the world.
+            </li>  
+            <li>
+                <b>Scalability and Adaptability</b>
+                In designing our IoT device concept, scalability and adaptability were central considerations. Inspired by the modular architecture of existing IoT platforms and devices, our device allows for seamless scalability to accommodate varying needs and environments. Whether deployed in urban areas, rural communities, or industrial settings, our device can be tailored to meet specific requirements, ensuring its effectiveness across diverse contexts, similar to the flexibility demonstrated by IoT solutions in addressing a wide range of challenges.</p>
+            </li>
+        </ul>
+            </section>
+        <section id="design">
+            <h2>Design</h2>
+            <section id="functional-specification">
+                <h3>Functional Specification</h3>
+                <p>The Finite State Machine (FSM) for this emergency response system manages transitions between
+                   various states to handle emergencies. Starting in an idle state, the system activates upon
+                   user interaction by pressing an emergency button on the TI CC3200 board. It then displays
+                   service options on the Adafruit OLED module and, based on the user's selection, coordinates 
+                   with AWS IoT services to dispatch GPS coordinates and service preferences. Utilizing 
+                   the Google Maps API, the system identifies the nearest emergency facilities and sends
+                   precise directions to the TI CC3200 board and the user's email via AWS SNS.
+                   After ensuring the necessary responses are in place, the FSM returns to its
+                   idle state, prepared to handle future emergencies.</p>
+                   <img src="images\Idle (2).png" alt="FSM" class="feature-image" style="display: block; margin-left: auto; margin-right: auto;" >
+            </section>
+            <section id="system-architecture">
+                <h3>System Architecture</h3>
+                <section id="system-architecture">
+                    <h4>Flow Diagram and Components</h4>
+                    <p>The major components of this system are  TI CC3200 microcontroller, IR Remote receiver, the Adafruit SSD1351 OLED, NEO-6M GPS Module and AWS IOT Web Services.</p>
+                    <img src="images\Final_Flowchart.jpg" alt="System Architecture" class="feature-image" style="display: block; margin-left: auto; margin-right: auto;" width="650" height="400">
+                    <ul>
+                        <li>
+                            <h4>TI CC3200 Microcontroller</h4>
+                            <p>The TI CC3200 microcontroller is a versatile chip designed for IoT applications, integrating a powerful ARM Cortex-M4 MCU and Wi-Fi connectivity. The CC3200 includes multiple GPIO pins for interfacing with various devices, UART for serial communication, and SPI for high-speed data transfer.</p>
+                        </li>
+                        <li>
+                            <h4>IR Receiver</h4>
+                            <p>Modulation in the context of infrared (IR) communication involves varying a carrier wave to encode information that can be transmitted through space as IR light signals. Typically, a base frequency for the carrier wave is chosen, which aligns with the optimal sensitivity of the IR receiver. For many consumer electronics, such as remote controls, a common frequency is around 36 kHz.</p>
+                        </li>
+                        <li>
+                            <h4>Adafruit SSD1351 OLED</h4>
+                            <p>The OLED SSD1351 128 RGB display module connects to a microcontroller via several key pins: VCC (power), GND (ground), SCL/SCK (serial clock for SPI), SDA/MOSI (serial data for SPI), DC (data/command control), CS (chip select to enable/disable the module), and RST (reset). Proper matching of these pins with the microcontroller's SPI interface is crucial for the display's operation.</p>
+                        </li>
+                        <li>
+                            <div class="flex-container">
+                                <div class="text-content">
+                                    <h4>NEO-6M and Patch Antenna</h4>
+                                    <p>The NEO-6M module contains a built-in receiver that picks up signals transmitted at the speed of light by GPS satellites orbiting the Earth. Each GPS satellite transmits data that includes its location and the exact time the signal was sent. Using the method of trilateration, the NEO-6M module can determine its precise location. Additionally, GPS satellites contain atomic clocks that provide precise timing. Once the receiver calculates its position, it uses National Marine Electronics Association (NMEA) format to output its data. This output typically includes information like current latitude, longitude, time, altitude, and almanac data.</p>
+                                    <p>The patch antenna used with the NEO-6M GPS module is a critical component, specifically tuned to the L1 frequency band of 1575.42 MHz to optimally receive GPS signals. Patch antennas predominantly radiate off the edges of the patch. Due to their flat design, patch antennas emit radio waves primarily upwards when mounted horizontally. Additionally, patch antennas can be designed to support linear or circular polarization to receive data from GPS.</p>
+                                </div>
+                                <div class="image-placeholder">
+                                    <img src="images\trilateration.jpg" alt="trilateration" style="display: block; margin-left: auto; margin-right: auto;" width="650" height="400">
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <h4>AWS IoT core</h4>
+                            <p>AWS IoT Core provides cloud management for devices. Device Shadow ensures consistent device state representation. It allows devices to update their state even when offline. This enables seamless device-cloud interaction. For example, devices can update their shadow state, reflecting changes in the cloud, facilitating robust IoT solutions.</p>
+                        </li>
+                        <li>
+                            <h4>AWS Lambda</h4>
+                            <p>AWS Lambda is a serverless computing service that implements a code in response to events without provisioning or managing servers. This seamless integration exemplifies the power and flexibility of AWS services in building robust IoT applications
+                            </p>
+                        </li>
+                        <li>
+                            <h4>AWS SNS</h4>
+                            <p>Amazon Simple Notification Service (SNS) is a fully managed messaging service offered by Amazon Web Services (AWS). It enables the delivery of messages to a variety of endpoints, including email, SMS, HTTP, and more. With SNS, you can easily send notifications, alerts, and messages to distributed systems and applications, ensuring timely communication and efficient handling of events. SNS provides a reliable and scalable
+                                 solution for delivering notifications, enhancing the overall functionality and user experience of your applications.</p>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+        </section>
+        <section id="implementation">
+            <h2>Implementation</h2>
+            <p>The IR receiver connects power (Vs), ground (GND), and output (OUT) pins, with a resistor and capacitor filtering noise, and outputs to pin 64, configured via SysConfig. The Neo-6M GPS uses UART to send NMEA format GPS data to the CC3200, with pins 58 and 59 set for UART1. The Adafruit OLED connects to the CC3200: VCC , GND, DC (pin 15), CS (pin 3), SCK (pin 5), Reset (pin 4), and MOSI (pin 7), enabling real-time data processing and display.
+            </p>            
+            <img src="images\EEC172_Circuit_page-0001 (1).jpg" alt="pinConfig" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 20px;" width="650" height="500">
+            <section id="subtopic1">
+                <h3>AT&T Remote and IR sensor</h3>
+                <p>The TV remote that we used, used an NEC communication protocol 
+                   The IR Receiver is configured to capture and decode signals from a remote control.
+                   We connected the IR receiver's OUT signal to an unused GPIO pin, configuring it as an input using the SysConfig tool. Our system used interrupts to detect edges of the IR signal and used the microcontroller’s SysTick module to measure pulse widths. The pin that was used to read the output of the IR Receiver was pin64. 
+                </p>
+            </section>
+            <section id="subtopic2">
+                <h3>GPS Module and UART</h3>
+                <p>The Neo-6M GPS module uses UART (Universal Asynchronous Receiver/Transmitter) communication to interface with the CC3200 board. Through its TX (transmit) and RX (receive) pins, the Neo-6M sends GPS data, including latitude, longitude, altitude, and time, in NMEA (National Marine Electronics Association) format.
+                   The UART communication ensures that the GPS data is accurately transmitted at a specified baud rate, typically 9600 bps. Using the SysConfig tool, we configured pins 58 and 59 for UART1 as transmitter and receiver pins, which were then connected to the GPS module. 
+                </p>
+            </section>
+            <section id="subtopic3">
+                <h3>OLED and SPI</h3>
+                <p>The Adafruit SSD1351 OLED module interfaces with the CC3200 board through the following pin connections: VCC (3.3V-5V) for power supply, GND for ground, DC (connected to pin 15) for differentiating command/data signals, CS (connected to pin 3) for selecting the OLED display, SCK (connected to pin 5) for clock signal synchronization,
+                    Reset (connected to pin 4) for resetting the device, and MOSI (connected to pin 7) for data transmission from the master device.</p>
+            </section>
+            <section id="subtopic4">
+                <h3>AWS IoT core, Lambda and SNS</h3>
+                <p>Our IoT solution utilizes AWS IoT Core to manage device-cloud interactions, employing device shadows to 
+                    persistently represent device states. A POST function updates the device shadow with coordinate data and
+                    emergency service types through AWS IoT Core's REST API endpoint. This mechanism ensures the device 
+                    state reflects the latest information, facilitating seamless communication between devices and cloud 
+                    applications. Additionally, AWS Lambda functions are triggered by incoming device data, processing it,
+                    making API calls to Google Directions & Places for nearby emergency services, and updating the device 
+                    shadow accordingly. The Lambda function automates this workflow, enhancing the IoT solution by dynamically
+                    enriching device data with contextually relevant information from external APIs. By integrating SNS, users receive timely alerts,
+                     ensuring they're informed in critical situations.This capability enhances user experience and underscores the versatility of AWS services in building comprehensive IoT solutions.</p>
+            </section>
+        </section>
+        <section id="demo">
+            <h2>Demo</h2>
+            <p>Watch our demo video to see EmergeNav in action.</p>
+            
+                <video controls width="800" height="450">
+                <source src="images\EmergeNav_FinalProject_SQEEC172 - Made with Clipchamp (1).mp4" type="video/mp4" >
+                </video>
+            
+        </section>
+        <section id="challenges">
+            <h2>Challenges</h2>
+            <p>The project faced several challenges, including integrating a GPS module that only functioned outdoors, complicating system integration.
+                 Connecting to AWS through Wi-Fi and ensuring GPS functionality indoors posed additional difficulties. Realizing the limitations of the Google Maps API, the team switched to the Google Directions and Places API for better nearest location information. However, adapting to the new API involved parsing JSON output, which became problematic when the API's format unexpectedly changed overnight. 
+                Overcoming these challenges demanded technical expertise, flexibility, and problem-solving skills from the project team.</p>
+        </section>
+        <section id="future-work">
+            <h2>Future Work</h2>
+            <p>Future work includes enhancing the device's capabilities by increasing its accuracy, range, and integrating additional sensors. We aim to improve the hardware with a GPS module that functions both indoors and outdoors. Another key development area is the user interface, focusing on making it more intuitive and user-friendly, including a graphical user interface (GUI) to guide users with step-by-step instructions and troubleshooting tips. Additionally, we plan to expand service integration by incorporating more third-party APIs and services,
+                 thereby improving the device's overall utility. These enhancements will lead to a more robust, versatile, 
+                 and user-centric solution.</p>
+        </section>
+        <section id="bill-of-materials">
+            <h2>Bill of Materials</h2>
+            <p>The bill of materials includes all the components used in the development of EmergeNav.</p>
+              <table border="1">
+                <tr>
+                  <th>Materials</th>
+                  <th>Supplier</th>
+                  <th>Qty.</th>
+                  <th>Unit Cost</th>
+                </tr>
+                <tr>
+                  <td>TI CC3200 microcontroller</td>
+                  <td>Lab</td>
+                  <td>2</td>
+                  <td>$55.00</td>
+                </tr>
+                <tr>
+                  <td>AT&T S10-S3 Remote</td>
+                  <td>Lab</td>
+                  <td>2</td>
+                  <td>$10.98</td>
+                </tr>
+                <tr>
+                  <td>Vishay TSOP311xx</td>
+                  <td>Lab</td>
+                  <td>2</td>
+                  <td>$1.41</td>
+                </tr>
+                <tr>
+                  <td>100Ω resistor</td>
+                  <td>Lab</td>
+                  <td>2</td>
+                  <td>$0.10</td>
+                </tr>
+                <tr>
+                  <td>100μF capacitor</td>
+                  <td>Lab</td>
+                  <td>2</td>
+                  <td>$0.27</td>
+                </tr>
+                <tr>
+                  <td>SSD1351 SPI OLED Display</td>
+                  <td>Lab</td>
+                  <td>2</td>
+                  <td>$11.52</td>
+                </tr>
+                <tr>
+                  <td>2 - NEO-6M GPS Module</td>
+                  <td>Amazon</td>
+                  <td>1</td>
+                  <td>$10.99</td>
+                </tr>
+              </table>
+              <p>Total cost including lab supplies: $169.55</p>
+              <p>Total cost excluding lab supplies: $10.99</p>
+            </section>
+    </main>
+    <footer>
+        <p>Contact us at</p>
+        <p><span style="color: #ff6f00">arusaxena@ucdavis.edu</span> | <span style="color: #ff6f00">lilmolina@ucdavis.edu</span></p>
+    </footer>
+</body>
+</html>
+
+
+
